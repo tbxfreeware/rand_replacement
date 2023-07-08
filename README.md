@@ -20,36 +20,36 @@ There are three ways to seed the `std::mt19937` random number engine used by `tb
 - `tbx::srand()` randomly seeds all 624 state variables using `std::random_device`.
 - `tbx::srand(seed_seq)` uses a `std::seed_seq` to seed all 624 state variables.
 
-***Important note:*** Be sure to include the appropriate template argument when calling one of the seeding functions. Each data type has its own random number engine, so if you omit the the template argument, you will probably end up seeding the wrong one.
+**Important note:** Be sure to include the appropriate template argument when calling one of the seeding functions. Each data type has its own random number engine, so if you omit the the template argument, you will probably end up seeding the wrong one.
 
 For example, `tbx::srand()` randomly seeds the engine that generates `int` values, while `tbx::srand<double>(42u)` seeds the engine that generates `double` values.
 
 ### A variety of result types
 `rand()` works with any of the types accepted by `std::uniform_int_distribution` or `std::uniform_real_distribution`, as well as their many type aliases from `<cstdint>`.
 ```cpp
-tbx::rand()  // same as tbx::rand<int>()
+tbx::rand();  // same as tbx::rand<int>()
 
-tbx::rand<short>()
-tbx::rand<int>()
-tbx::rand<long>()
-tbx::rand<long long>()
+tbx::rand<short>();
+tbx::rand<int>();
+tbx::rand<long>();
+tbx::rand<long long>();
 
-tbx::rand<unsigned short>()
-tbx::rand<unsigned int>()
-tbx::rand<unsigned long>()
-tbx::rand<unsigned long long>()
+tbx::rand<unsigned short>();
+tbx::rand<unsigned int>();
+tbx::rand<unsigned long>();
+tbx::rand<unsigned long long>();
 
-tbx::rand<float>()
-tbx::rand<double>()
-tbx::rand<long double>()
+tbx::rand<float>();
+tbx::rand<double>();
+tbx::rand<long double>();
 
-tbx::rand<std::int16_t>
-tbx::rand<std::int32_t>
-tbx::rand<std::int64_t>
+tbx::rand<std::int16_t>();
+tbx::rand<std::int32_t>();
+tbx::rand<std::int64_t>();
 
-tbx::rand<std::uint16_t>
-tbx::rand<std::uint32_t>
-tbx::rand<std::uint64_t>
+tbx::rand<std::uint16_t>();
+tbx::rand<std::uint32_t>();
+tbx::rand<std::uint64_t>();
 
 // etc.
 ```
