@@ -8,17 +8,20 @@
 - Adding function arguments restricts the range of generated numbers. For example, `tbx::rand(1, 6)` gets you a dice roll of type `int`, and `tbx::rand<double>(-180.0, 180.0)` generates a random angle between +/- 180 degrees.
 
 ### A variety of result types
-`rand()` works with any of types accepted by `std::uniform_int_distribution` or `std::uniform_real_distribution`, as well as their many type aliases from `<cstdint>`.
-```
+`rand()` works with any of the types accepted by `std::uniform_int_distribution` or `std::uniform_real_distribution`, as well as their many type aliases from `<cstdint>`.
+```cpp
 tbx::rand()  // int
+
 tbx::rand<short>()
 tbx::rand<int>()
 tbx::rand<long>()
 tbx::rand<long long>()
+
 tbx::rand<unsigned short>()
 tbx::rand<unsigned int>()
 tbx::rand<unsigned long>()
 tbx::rand<unsigned long long>()
+
 tbx::rand<float>()
 tbx::rand<double>()
 tbx::rand<long double>()
