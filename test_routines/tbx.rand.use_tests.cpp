@@ -49,9 +49,11 @@ namespace
     {
         ost << n_rolls << " Dice Rolls:\n";
         std::array<int, 6> count{};
+        auto const p{ tbx::param_type<int>(1, 6) };
+        tbx::srand();
         for (auto i{ n_rolls }; i--;)
         {
-            auto const r = tbx::rand(1, 6);
+            auto const r = tbx::rand(p);
             if (show_every_roll)
                 ost << r << ' ';
             ++count[r - 1];
