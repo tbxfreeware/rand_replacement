@@ -24,7 +24,7 @@ There are three ways to seed the `std::mt19937` random number engine used by `tb
 
 **Important note:** Be sure to include the appropriate template argument when calling one of the seeding functions. Each data type has its own random number engine, so if you omit the the template argument, you will probably end up seeding the wrong one.
 
-For example, `tbx::srand()` seeds the engine that generates `int` values, while `tbx::srand<double>(42u)` seeds the engine that generates `double` values.
+For example, `tbx::srand(42u)` seeds the engine that generates `int` values, while `tbx::srand<double>(42u)` seeds the engine that generates `double` values.
 
 ## A variety of result types
 `rand()` works with any of the types accepted by `std::uniform_int_distribution` or `std::uniform_real_distribution`, as well as their many type aliases from `<cstdint>`.
