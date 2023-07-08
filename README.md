@@ -10,7 +10,7 @@
 ### A variety of result types
 `rand()` works with any of the types accepted by `std::uniform_int_distribution` or `std::uniform_real_distribution`, as well as their many type aliases from `<cstdint>`.
 ```cpp
-tbx::rand()  // int
+tbx::rand()  // same as tbx::rand<int>()
 
 tbx::rand<short>()
 tbx::rand<int>()
@@ -25,6 +25,16 @@ tbx::rand<unsigned long long>()
 tbx::rand<float>()
 tbx::rand<double>()
 tbx::rand<long double>()
+
+tbx::rand<std::int16_t>
+tbx::rand<std::int32_t>
+tbx::rand<std::int64_t>
+
+tbx::rand<std::uint16_t>
+tbx::rand<std::uint32_t>
+tbx::rand<std::uint64_t>
+
+// etc.
 ```
 
 ### Expanded seeding options
