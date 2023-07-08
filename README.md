@@ -29,29 +29,32 @@ For example, `tbx::srand()` seeds the engine that generates `int` values, while 
 ## A variety of result types
 `rand()` works with any of the types accepted by `std::uniform_int_distribution` or `std::uniform_real_distribution`, as well as their many type aliases from `<cstdint>`.
 ```cpp
-tbx::rand();  // same as tbx::rand<int>()
+// Note that the argument to srand(seed) always has type unsigned, 
+// even though its template argument may be different.
 
-tbx::rand<short>();
-tbx::rand<int>();
-tbx::rand<long>();
-tbx::rand<long long>();
+tbx::srand(42u); tbx::rand();  // same as tbx::srand<int>(42u); tbx::rand<int>();
 
-tbx::rand<unsigned short>();
-tbx::rand<unsigned int>();
-tbx::rand<unsigned long>();
-tbx::rand<unsigned long long>();
+tbx::srand<short>(42u); tbx::rand<short>();
+tbx::srand<int>(42u); tbx::rand<int>();
+tbx::srand<long>(42u); tbx::rand<long>();
+tbx::srand<long long>(42u); tbx::rand<long long>();
 
-tbx::rand<float>();
-tbx::rand<double>();
-tbx::rand<long double>();
+tbx::srand<short>(42u); tbx::rand<unsigned short>();
+tbx::srand<int>(42u); tbx::rand<unsigned int>();
+tbx::srand<long>(42u); tbx::rand<unsigned long>();
+tbx::srand<long long>(42u); tbx::rand<unsigned long long>();
 
-tbx::rand<std::int16_t>();
-tbx::rand<std::int32_t>();
-tbx::rand<std::int64_t>();
+tbx::srand<float>(42u); tbx::rand<float>();
+tbx::srand<double>(42u); tbx::rand<double>();
+tbx::srand<long double>(42u); tbx::rand<long double>();
 
-tbx::rand<std::uint16_t>();
-tbx::rand<std::uint32_t>();
-tbx::rand<std::uint64_t>();
+tbx::srand<std::int16_t>(42u); tbx::rand<std::int16_t>();
+tbx::srand<std::int32_t>(42u); tbx::rand<std::int32_t>();
+tbx::srand<std::int64_t>(42u); tbx::rand<std::int64_t>();
+
+tbx::srand<std::uint16_t>(42u); tbx::rand<std::uint16_t>();
+tbx::srand<std::uint32_t>(42u); tbx::rand<std::uint32_t>();
+tbx::srand<std::uint64_t>(42u); tbx::rand<std::uint64_t>();
 
 // etc.
 ```
