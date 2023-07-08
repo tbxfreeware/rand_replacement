@@ -153,7 +153,7 @@ namespace tbx
     template <typename ResultType, typename = void>
     struct uniform_distribution
     {
-        static_assert(tbx::is_integral_short_int_long_v<ResultType>, "");
+        static_assert(tbx::is_integral_short_int_long_v<ResultType>);
         using type = std::uniform_int_distribution<ResultType>;
     };
     template <typename ResultType>
@@ -176,7 +176,7 @@ namespace tbx
     template <typename ResultType>
     class rand_replacement
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
     public:
         using urbg_type = std::mt19937;
         using seed_type = typename std::mt19937::result_type;
@@ -201,7 +201,7 @@ namespace tbx
             return dist_(eng_, make_param(a, b));
         }
     private:
-        auto static constexpr make_param(ResultType const a, ResultType const b) -> param_type
+        auto static constexpr make_param(ResultType const a, ResultType const b)
         {
             return param_type
             {
@@ -229,7 +229,7 @@ namespace tbx
     template <typename ResultType>
     inline auto& rr()
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
         static thread_local tbx::rand_replacement<ResultType> r;
         return r;
     }
@@ -240,49 +240,49 @@ namespace tbx
     template <typename ResultType = int>
     inline auto rand()
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
         return tbx::rr<ResultType>().rand();
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline auto rand(ResultType const a, ResultType const b)
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
         return tbx::rr<ResultType>().rand(a, b);
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline auto rand(tbx::param_type<ResultType> const p)
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
         return tbx::rr<ResultType>().rand(p);
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline auto rand_max()
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
         return tbx::rr<ResultType>().rand_max();
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline void srand()
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
         tbx::rr<ResultType>().srand();  // seed randomly from std::random_device
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline void srand(typename std::mt19937::result_type const seed)
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
         tbx::rr<ResultType>().srand(seed);  // seed from unsigned int
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline void srand(std::seed_seq const& seq)
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
         tbx::rr<ResultType>().srand(seq);  // seed from std::seed_seq
     }
     //------------------------------------------------------------------
