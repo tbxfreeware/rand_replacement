@@ -209,8 +209,8 @@ namespace tbx
                 : b < a ? param_type{ b, a }
                 : tbx::is_integral_short_int_long_v<ResultType> ? param_type{ a, b }
                 : throw std::invalid_argument(
-                "tbx::rand_replacement<ResultType>::make_param(a, b): "
-                "floating-point arguments require a != b")
+                    "tbx::rand_replacement<ResultType>::make_param(a, b): "
+                    "floating-point arguments require a != b")
             };
         }
         void seed_randomly()
