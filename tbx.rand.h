@@ -193,7 +193,7 @@ namespace tbx
         void srand(seed_type const seed)     { dist_.reset(); eng_.seed(seed); }
 
         // Non-standard overloads
-        void srand() { dist_.reset(); seed_randomly(); }
+        void srand()                         { dist_.reset(); seed_randomly(); }
         void srand(std::seed_seq const& seq) { dist_.reset(); eng_.seed(seq); }
         auto rand(param_type const& p)       { return dist_(eng_, p); }
         auto rand(result_type const a, result_type const b)
