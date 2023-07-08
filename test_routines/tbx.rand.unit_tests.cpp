@@ -22,14 +22,14 @@
 // SOFTWARE.
 //================================================================================
 #include <array>        // array
-#include <cassert>		// assert
+#include <cassert>      // assert
 #include <cstddef>      // size_t
 #include <cstdint>      // int16_t, int32_t, int64_t, uint16_t, uint32_t, uint64_t
-#include <iostream>		// basic_ostream
-#include <limits>		// numeric_limits
-#include <random>		// mt19937, seed_seq, uniform_int_distribution
+#include <iostream>     // basic_ostream
+#include <limits>       // numeric_limits
+#include <random>       // mt19937, seed_seq, uniform_int_distribution
 #include <string>       // char_traits, string
-#include <thread>		// thread
+#include <thread>       // thread
 #include <type_traits>  // is_floating_point_v, is_same_v, is_unsigned_v
 
 #include "tbx.rand.h"

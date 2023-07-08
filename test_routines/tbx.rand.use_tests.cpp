@@ -25,10 +25,10 @@
 
 #include <algorithm>    // equal
 #include <array>        // array
-#include <cassert>		// assert
+#include <cassert>      // assert
 #include <cstdint>      // int16_t, int32_t, int64_t, uint16_t, uint32_t, uint64_t
-#include <iomanip>		// setw
-#include <iostream>		// basic_ostream
+#include <iomanip>      // setw
+#include <iostream>     // basic_ostream
 #include <string>       // char_traits, string
 #include <thread>       // thread
 #include <vector>       // cbegin, cend, vector
