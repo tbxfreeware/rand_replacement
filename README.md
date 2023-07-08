@@ -34,18 +34,18 @@ For example, `tbx::srand()` seeds the engine that generates `int` values, while 
 
 tbx::srand(42u); tbx::rand();  // same as tbx::srand<int>(42u); tbx::rand<int>();
 
-tbx::srand<short>(42u); tbx::rand<short>();
-tbx::srand<int>(42u); tbx::rand<int>();
-tbx::srand<long>(42u); tbx::rand<long>();
+tbx::srand<short>(42u);     tbx::rand<short>();
+tbx::srand<int>(42u);       tbx::rand<int>();
+tbx::srand<long>(42u);      tbx::rand<long>();
 tbx::srand<long long>(42u); tbx::rand<long long>();
 
-tbx::srand<short>(42u); tbx::rand<unsigned short>();
-tbx::srand<int>(42u); tbx::rand<unsigned int>();
-tbx::srand<long>(42u); tbx::rand<unsigned long>();
-tbx::srand<long long>(42u); tbx::rand<unsigned long long>();
+tbx::srand<unsigned short>(42u);     tbx::rand<unsigned short>();
+tbx::srand<unsigned int>(42u);       tbx::rand<unsigned int>();
+tbx::srand<unsigned long>(42u);      tbx::rand<unsigned long>();
+tbx::srand<unsigned long long>(42u); tbx::rand<unsigned long long>();
 
-tbx::srand<float>(42u); tbx::rand<float>();
-tbx::srand<double>(42u); tbx::rand<double>();
+tbx::srand<float>(42u);       tbx::rand<float>();
+tbx::srand<double>(42u);      tbx::rand<double>();
 tbx::srand<long double>(42u); tbx::rand<long double>();
 
 tbx::srand<std::int16_t>(42u); tbx::rand<std::int16_t>();
