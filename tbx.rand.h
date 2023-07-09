@@ -111,12 +111,29 @@
 //======================================================================
 
 #include <cstddef>      // size_t
+#include <cstdint>      // uint_fast16_t
 #include <random>       // mt19937, random_device, seed_seq, uniform_int_distribution, uniform_real_distribution
 #include <sstream>      // stringstream
 #include <type_traits>  // enable_if_t, integral_constant, is_floating_point_v, is_same_v, remove_cv_t
 
 namespace tbx
 {
+    //==================================================================
+    // is_bool_or_char
+    //==================================================================
+    template <typename T>
+    struct is_bool_or_char : std::integral_constant
+        < bool
+        , std::is_same_v<std::remove_cv_t<T>, bool>
+        || std::is_same_v<std::remove_cv_t<T>, char>
+        || std::is_same_v<std::remove_cv_t<T>, signed char>
+        || std::is_same_v<std::remove_cv_t<T>, unsigned char>
+        >
+    {};
+    template <typename T>
+    bool constexpr is_bool_or_char_v
+        = tbx::is_bool_or_char<T>::value;
+
     //==================================================================
     // is_integral_short_int_long
     //==================================================================
@@ -151,12 +168,24 @@ namespace tbx
         = tbx::is_arithmetic_short_int_long<T>::value;
 
     //==================================================================
+    // is_arithmetic
+    //==================================================================
+    template <typename T>
+    struct is_arithmetic : std::integral_constant
+        < bool
+        , tbx::is_arithmetic_short_int_long_v<T> || tbx::is_bool_or_char_v<T>
+        >
+    {};
+    template <typename T>
+    bool constexpr is_arithmetic_v = tbx::is_arithmetic<T>::value;
+
+    //==================================================================
     // uniform_distribution
     //==================================================================
     template <typename ResultType, typename = void>
     struct uniform_distribution
     {
-        static_assert(tbx::is_integral_short_int_long_v<ResultType>);
+        static_assert(tbx::is_integral_short_int_long_v<ResultType>, "");
         using type = std::uniform_int_distribution<ResultType>;
     };
     template <typename ResultType>
@@ -170,16 +199,27 @@ namespace tbx
     //==================================================================
     // param_type
     //==================================================================
+    template <typename ResultType, typename = void>
+    struct param
+    {
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        using type = typename tbx::uniform_distribution_t<ResultType>::param_type;
+    };
     template <typename ResultType>
-    using param_type = typename tbx::uniform_distribution_t<ResultType>::param_type;
+    struct param<ResultType, std::enable_if_t<tbx::is_bool_or_char_v<ResultType>>>
+    {
+        using type = typename std::uniform_int_distribution<std::int_fast16_t>::param_type;
+    };
+    template <typename ResultType>
+    using param_type = typename tbx::param<ResultType>::type;
 
     //==================================================================
     // rand_replacement
     //==================================================================
-    template <typename ResultType>
+    template <typename ResultType, typename = void>
     class rand_replacement
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
     public:
         using urbg_type = std::mt19937;
         using seed_type = typename std::mt19937::result_type;
@@ -204,7 +244,7 @@ namespace tbx
             return dist_(eng_, make_param(a, b));
         }
     private:
-        auto static constexpr make_param(ResultType const a, ResultType const b)
+        auto static constexpr make_param(result_type const a, result_type const b)
         {
             return param_type
             {
@@ -227,12 +267,72 @@ namespace tbx
     };
 
     //==================================================================
+    // rand_replacement - specialization for bool and char types
+    //==================================================================
+    template <typename ResultType>
+    class rand_replacement<ResultType, std::enable_if_t<tbx::is_bool_or_char_v<ResultType>>>
+    {
+    public:
+        using urbg_type = std::mt19937;
+        using seed_type = typename std::mt19937::result_type;
+        using distribution_type = std::uniform_int_distribution<std::int_fast16_t>;
+        using param_type = typename distribution_type::param_type;
+        using result_type = ResultType;
+    private:
+        enum : std::int_fast16_t
+        {
+            zero
+            , max = static_cast<std::int_fast16_t>(std::numeric_limits<result_type>::max())
+            , min = static_cast<std::int_fast16_t>(std::numeric_limits<result_type>::min())
+        };
+        urbg_type eng_{ seed_type{1u} };  // By default, rand() uses seed 1u.
+        distribution_type dist_{ zero, max };
+    public:
+        // Drop-in replacements for rand(), RAND_MAX, and srand(seed)
+        auto rand()                          { return static_cast<result_type>(dist_(eng_)); }
+        auto rand_max()                      { return std::numeric_limits<result_type>::max(); }
+        void srand(seed_type const seed)     { dist_.reset(); eng_.seed(seed); }
+
+        // Non-standard overloads
+        void srand()                         { dist_.reset(); seed_randomly(); }
+        void srand(std::seed_seq const& seq) { dist_.reset(); eng_.seed(seq); }
+        auto rand(param_type const& p)       { return static_cast<result_type>(dist_(eng_, check(p))); }
+        auto rand(result_type const a, result_type const b)
+        {
+            return static_cast<result_type>(dist_(eng_, make_param(a, b)));
+        }
+    private:
+        auto static constexpr& check(param_type const& params)
+        {
+            return min <= params.a() && params.b() <= max 
+                ? params
+                : throw std::invalid_argument(
+                    "tbx::rand_replacement<ResultType>::check(params): "
+                    "params out of range for bool or char arguments");
+        }
+        auto static constexpr make_param(result_type const a, result_type const b)
+        {
+            auto const aa{ static_cast<std::int_fast16_t>(a) };
+            auto const bb{ static_cast<std::int_fast16_t>(b) };
+            return aa < bb ? param_type{ aa, bb } : param_type{ bb, aa };
+        }
+        void seed_randomly()
+        {
+            std::random_device rd;
+            std::stringstream ss;
+            for (std::size_t i{ std::mt19937::state_size }; i--;)
+                ss << rd() << ' ';
+            ss >> eng_;
+        }
+    };
+
+    //==================================================================
     // rr - "rand replacement"
     //==================================================================
     template <typename ResultType>
     inline auto& rr()
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
+        static_assert(tbx::is_arithmetic_v<ResultType>, "");
         static thread_local tbx::rand_replacement<ResultType> r;
         return r;
     }
@@ -243,49 +343,49 @@ namespace tbx
     template <typename ResultType = int>
     inline auto rand()
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
+        static_assert(tbx::is_arithmetic_v<ResultType>, "");
         return tbx::rr<ResultType>().rand();
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline auto rand(ResultType const a, ResultType const b)
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
+        static_assert(tbx::is_arithmetic_v<ResultType>, "");
         return tbx::rr<ResultType>().rand(a, b);
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline auto rand(tbx::param_type<ResultType> const p)
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
+        static_assert(tbx::is_arithmetic_v<ResultType>, "");
         return tbx::rr<ResultType>().rand(p);
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline auto rand_max()
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
+        static_assert(tbx::is_arithmetic_v<ResultType>, "");
         return tbx::rr<ResultType>().rand_max();
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline void srand()
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
+        static_assert(tbx::is_arithmetic_v<ResultType>, "");
         tbx::rr<ResultType>().srand();  // seed randomly from std::random_device
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline void srand(typename std::mt19937::result_type const seed)
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
+        static_assert(tbx::is_arithmetic_v<ResultType>, "");
         tbx::rr<ResultType>().srand(seed);  // seed from unsigned int
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
     inline void srand(std::seed_seq const& seq)
     {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>);
+        static_assert(tbx::is_arithmetic_v<ResultType>, "");
         tbx::rr<ResultType>().srand(seq);  // seed from std::seed_seq
     }
     //------------------------------------------------------------------
