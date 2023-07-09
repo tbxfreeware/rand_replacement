@@ -1,4 +1,4 @@
-# Random numbers in C++
+# Random numbers in C++14
 `tbx.rand.h` provides feature-rich replacements for `rand()` and `srand(seed)` from the standard library header `<cstdlib>`.
 ## Simple user interface
 - Without template arguments, `tbx::rand()` and `tbx::srand(seed)` behave the same as the corresponding functions in `<cstdlib>`.
