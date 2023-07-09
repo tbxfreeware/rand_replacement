@@ -35,6 +35,112 @@
 #include "tbx.rand.h"
 
 //======================================================================
+// Test Routines - ResultType bool
+//======================================================================
+namespace
+{
+    bool bool_result_type__test_rand()
+    {
+        static_assert(std::is_same_v<bool, decltype(tbx::rand<bool>())>, "");
+        auto const r{ tbx::rand<bool>() };
+        enum : int { n_trials = 10'000 };
+        auto pass{ false };
+        for (int i{ n_trials }; i--;)
+            if (tbx::rand<bool>() != r)
+            {
+                // This test demonstrates that output varies.
+                pass = true;
+                break;
+            }
+        assert(pass);
+        return pass;
+    }
+    //------------------------------------------------------------------
+    bool bool_result_type__test_rand__a_b(bool const a, bool const b)
+    {
+        static_assert(std::is_same_v<bool, decltype(tbx::rand<bool>(a, b))>, "");
+
+        auto pass{ true };
+        auto const r{ tbx::rand<bool>() };
+        if (a == b)
+        {
+            pass = (r == tbx::rand<bool>(a, b)) && pass;
+            assert(pass);
+        }
+        else
+        {
+            auto output_varies{ false };
+            enum : int { n_trials = 10'000 };
+            for (int i{ n_trials }; i--;)
+                if (tbx::rand<bool>() != r)
+                {
+                    output_varies = true;
+                    break;
+                }
+            assert(output_varies);
+            pass = pass && output_varies;
+        }
+        return pass;
+    }
+    //------------------------------------------------------------------
+    bool bool_result_type__test_rand__a_b()
+    {
+        auto pass{ true };
+        pass = bool_result_type__test_rand__a_b(false, true) && pass;
+        pass = bool_result_type__test_rand__a_b(false, false) && pass;
+        pass = bool_result_type__test_rand__a_b(true, true) && pass;
+        return pass;
+    }
+    //------------------------------------------------------------------
+    bool bool_result_type__test_rand__param(bool const a, bool const b)
+    {
+        int const aa{ static_cast<int>(a) }, bb{ static_cast<int>(b) };
+        tbx::param_type<int> p(aa, bb);
+        static_assert(std::is_same_v<bool, decltype(tbx::rand<bool>(p))>, "");
+
+        auto pass{ true };
+        auto const r{ tbx::rand<bool>(p) };
+        if (a == b)
+        {
+            pass = (r == tbx::rand<bool>(p)) && pass;
+            assert(pass);
+        }
+        else
+        {
+            auto output_varies{ false };
+            enum : int { n_trials = 10'000 };
+            for (int i{ n_trials }; i--;)
+                if (tbx::rand<bool>() != r)
+                {
+                    output_varies = true;
+                    break;
+                }
+            assert(output_varies);
+            pass = pass && output_varies;
+        }
+        return pass;
+    }
+    //------------------------------------------------------------------
+    bool bool_result_type__test_rand__param()
+    {
+        auto pass{ true };
+        pass = bool_result_type__test_rand__param(false, true) && pass;
+        pass = bool_result_type__test_rand__param(false, false) && pass;
+        pass = bool_result_type__test_rand__param(true, true) && pass;
+        return pass;
+    }
+    //------------------------------------------------------------------
+    bool bool_result_type__test_rand_max()
+    {
+        static_assert(std::is_same_v<bool, decltype(tbx::rand_max<bool>())>, "");
+        auto const pass1{ tbx::rand_max<bool>() == true };
+        assert(pass1);
+        auto const pass2{ tbx::rand_max<bool>() == std::numeric_limits<bool>::max() };
+        assert(pass2);
+        return pass1 && pass2;
+    }
+}
+//======================================================================
 // Test Routines - Omitted ResultType
 //======================================================================
 namespace
@@ -42,7 +148,7 @@ namespace
     bool omit_result_type__test_rand()
     {
         using ResultType = int;
-        static_assert(std::is_same_v<ResultType, decltype(tbx::rand())>);
+        static_assert(std::is_same_v<ResultType, decltype(tbx::rand())>, "");
         enum : int { n_trials = 1000, failure_threshold = n_trials / 4 };
 
         auto pass1{ true };
@@ -75,7 +181,7 @@ namespace
     bool omit_result_type__test_rand__a_b(int const a, int const b)
     {
         using ResultType = int;
-        static_assert(std::is_same_v<ResultType, decltype(tbx::rand(a, b))>);
+        static_assert(std::is_same_v<ResultType, decltype(tbx::rand(a, b))>, "");
         enum : int { n_trials = 1000 };
 
         auto const aa{ b < a ? b : a };
@@ -123,7 +229,7 @@ namespace
     {
         using ResultType = int;
         tbx::param_type<ResultType> p{ a, b };
-        static_assert(std::is_same_v<ResultType, decltype(tbx::rand(p))>);
+        static_assert(std::is_same_v<ResultType, decltype(tbx::rand(p))>, "");
         enum : int { n_trials = 1000 };
 
         auto pass{ true };
@@ -163,7 +269,7 @@ namespace
     bool omit_result_type__test_rand_max()
     {
         using Resulttype = int;
-        static_assert(std::is_same_v<Resulttype, decltype(tbx::rand_max())>);
+        static_assert(std::is_same_v<Resulttype, decltype(tbx::rand_max())>, "");
         auto const pass1{ tbx::rand_max() == std::uniform_int_distribution<Resulttype>{}.max() };
         assert(pass1);
         auto const pass2{ tbx::rand_max() == std::numeric_limits<Resulttype>::max() };
@@ -173,7 +279,7 @@ namespace
     //------------------------------------------------------------------
     bool omit_result_type__test_srand()
     {
-        static_assert(std::is_same_v<void, decltype(tbx::srand())>);
+        static_assert(std::is_same_v<void, decltype(tbx::srand())>, "");
         tbx::srand();
         auto const r{ tbx::rand() };
         enum : int { n_trials = 1000 };
@@ -199,7 +305,7 @@ namespace
 
         using seed_type = typename std::mt19937::result_type;
         seed_type const arbitrary_seed{ std::random_device{}() };
-        static_assert(std::is_same_v<void, decltype(tbx::srand(arbitrary_seed))>);
+        static_assert(std::is_same_v<void, decltype(tbx::srand(arbitrary_seed))>, "");
 
         tbx::srand(arbitrary_seed);
         for (auto& v : values)
@@ -224,7 +330,7 @@ namespace
         std::array<ResultType, n_trials> values;
 
         std::seed_seq const arbitrary_seed_seq{ 1, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
-        static_assert(std::is_same_v<void, decltype(tbx::srand(arbitrary_seed_seq))>);
+        static_assert(std::is_same_v<void, decltype(tbx::srand(arbitrary_seed_seq))>, "");
 
         tbx::srand(arbitrary_seed_seq);
         for (auto& v : values)
@@ -310,7 +416,7 @@ namespace
     template <typename ResultType>
     bool vary_result_type__test_rand()
     {
-        static_assert(std::is_same_v<ResultType, decltype(tbx::rand<ResultType>())>);
+        static_assert(std::is_same_v<ResultType, decltype(tbx::rand<ResultType>())>, "");
         enum : int { n_trials = 1000, failure_threshold = n_trials / 4 };
 
         auto pass1{ true };
@@ -348,7 +454,7 @@ namespace
     template <typename ResultType>
     bool vary_result_type__test_rand__a_b(ResultType const a, ResultType const b)
     {
-        static_assert(std::is_same_v<ResultType, decltype(tbx::rand<ResultType>(a, b))>);
+        static_assert(std::is_same_v<ResultType, decltype(tbx::rand<ResultType>(a, b))>, "");
         enum : int { n_trials = 1000 };
 
         auto const aa{ b < a ? b : a };
@@ -380,12 +486,15 @@ namespace
     bool vary_result_type__test_rand__a_b()
     {
         auto pass{ true };
-        pass = ::vary_result_type__test_rand__a_b<ResultType>(  // one "normal" case
+        pass = ::vary_result_type__test_rand__a_b<ResultType>(  // a few "normal" cases
             static_cast<ResultType>(1),
             static_cast<ResultType>(6)) && pass;
+        pass = ::vary_result_type__test_rand__a_b<ResultType>(
+            static_cast<ResultType>('a'),
+            static_cast<ResultType>('z')) && pass;
         if /* constexpr */ (!std::is_unsigned_v<ResultType>)
         {
-            pass = ::vary_result_type__test_rand__a_b<ResultType>(  // another fairly "normal" case
+            pass = ::vary_result_type__test_rand__a_b<ResultType>(
                 static_cast<ResultType>(-1),
                 static_cast<ResultType>(+1)) && pass;
         }
@@ -411,7 +520,7 @@ namespace
     bool vary_result_type__test_rand__param(ResultType const a, ResultType const b)
     {
         tbx::param_type<ResultType> p{ a, b };
-        static_assert(std::is_same_v<ResultType, decltype(tbx::rand<ResultType>(p))>);
+        static_assert(std::is_same_v<ResultType, decltype(tbx::rand<ResultType>(p))>, "");
         enum : int { n_trials = 1000 };
 
         auto pass{ true };
@@ -461,10 +570,12 @@ namespace
     template <typename ResultType>
     bool vary_result_type__test_rand_max()
     {
-        static_assert(std::is_same_v<ResultType, decltype(tbx::rand_max<ResultType>())>);
+        static_assert(std::is_same_v<ResultType, decltype(tbx::rand_max<ResultType>())>, "");
         auto const pass1
         {
-            tbx::rand_max<ResultType>() == tbx::uniform_distribution_t<ResultType>{}.max()
+            tbx::is_bool_or_char_v<ResultType>
+            ? true
+            : tbx::rand_max<ResultType>() == typename tbx::param_type<ResultType>::distribution_type{}.max()
         };
         assert(pass1);
         auto const pass2
@@ -480,7 +591,7 @@ namespace
     template <typename ResultType>
     bool vary_result_type__test_srand()
     {
-        static_assert(std::is_same_v<void, decltype(tbx::srand<ResultType>())>);
+        static_assert(std::is_same_v<void, decltype(tbx::srand<ResultType>())>, "");
         tbx::srand<ResultType>();
         auto const r{ tbx::rand<ResultType>() };
         enum : int { n_trials = 1000 };
@@ -503,7 +614,7 @@ namespace
     {
         using seed_type = typename std::mt19937::result_type;
         seed_type const arbitrary_seed{ std::random_device{}() };
-        static_assert(std::is_same_v<void, decltype(tbx::srand<ResultType>(arbitrary_seed))>);
+        static_assert(std::is_same_v<void, decltype(tbx::srand<ResultType>(arbitrary_seed))>, "");
 
         enum : std::size_t { n_trials = 42u };
         std::array<ResultType, n_trials> values{};
@@ -528,7 +639,7 @@ namespace
     bool vary_result_type__test_srand__seed_seq()
     {
         std::seed_seq const arbitrary_seed_seq{ 1, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
-        static_assert(std::is_same_v<void, decltype(tbx::srand<ResultType>(arbitrary_seed_seq))>);
+        static_assert(std::is_same_v<void, decltype(tbx::srand<ResultType>(arbitrary_seed_seq))>, "");
 
         enum : std::size_t { n_trials = 42u };
         std::array<ResultType, n_trials> values{};
@@ -608,6 +719,29 @@ namespace
     }
 }
 //======================================================================
+// Driver Routine - Boolean ResultType 
+//======================================================================
+namespace
+{
+    template <typename charT, typename traits>
+    bool bool_result_type(std::basic_ostream<char, traits>& ost)
+    {
+        auto pass{ true };
+        pass = ::bool_result_type__test_rand_max    () && pass;
+        pass = ::bool_result_type__test_rand        () && pass;
+        pass = ::bool_result_type__test_rand__a_b   () && pass;
+        pass = ::bool_result_type__test_rand__param () && pass;
+
+        pass = ::vary_result_type__test_srand              <bool>() && pass;
+        pass = ::vary_result_type__test_srand__seed        <bool>() && pass;
+        pass = ::vary_result_type__test_srand__seed_seq    <bool>() && pass;
+        pass = ::vary_result_type__test_thread_local       <bool>() && pass;
+        pass = ::vary_result_type__test_unseeded_first_use <bool>() && pass;
+        ost << (pass ? "  pass : " : "  FAIL : ") << "bool \n";
+        return pass;
+    }
+}
+//======================================================================
 // Driver Routine - Omitted ResultType 
 //======================================================================
 namespace
@@ -657,15 +791,34 @@ namespace
     bool vary_result_type(std::basic_ostream<charT, traits>& ost)
     {
         auto pass{ true };
-        pass = ::vary_result_type<charT, traits, std::int16_t  >(ost, "std::int16_t" ) && pass;
-        pass = ::vary_result_type<charT, traits, std::int32_t  >(ost, "std::int32_t" ) && pass;
-        pass = ::vary_result_type<charT, traits, std::int64_t  >(ost, "std::int64_t" ) && pass;
-        pass = ::vary_result_type<charT, traits, std::uint16_t >(ost, "std::uint16_t") && pass;
-        pass = ::vary_result_type<charT, traits, std::uint32_t >(ost, "std::uint32_t") && pass;
-        pass = ::vary_result_type<charT, traits, std::uint64_t >(ost, "std::uint64_t") && pass;
-        pass = ::vary_result_type<charT, traits, float         >(ost, "float"        ) && pass;
-        pass = ::vary_result_type<charT, traits, double        >(ost, "double"       ) && pass;
-        pass = ::vary_result_type<charT, traits, long double   >(ost, "long double"  ) && pass;
+        pass = ::vary_result_type<charT, traits, char               >(ost, "char"              ) && pass;
+        ost.put('\n');
+        pass = ::vary_result_type<charT, traits, signed char        >(ost, "signed char"       ) && pass;
+        pass = ::vary_result_type<charT, traits, short              >(ost, "short"             ) && pass;
+        pass = ::vary_result_type<charT, traits, int                >(ost, "int"               ) && pass;
+        pass = ::vary_result_type<charT, traits, long               >(ost, "long"              ) && pass;
+        pass = ::vary_result_type<charT, traits, long long          >(ost, "long long"         ) && pass;
+        ost.put('\n');
+        pass = ::vary_result_type<charT, traits, unsigned char      >(ost, "unsigned char"     ) && pass;
+        pass = ::vary_result_type<charT, traits, unsigned short     >(ost, "unsigned short"    ) && pass;
+        pass = ::vary_result_type<charT, traits, unsigned int       >(ost, "unsigned int"      ) && pass;
+        pass = ::vary_result_type<charT, traits, unsigned long      >(ost, "unsigned long"     ) && pass;
+        pass = ::vary_result_type<charT, traits, unsigned long long >(ost, "unsigned long long") && pass;
+        ost.put('\n');
+        pass = ::vary_result_type<charT, traits, float              >(ost, "float"             ) && pass;
+        pass = ::vary_result_type<charT, traits, double             >(ost, "double"            ) && pass;
+        pass = ::vary_result_type<charT, traits, long double        >(ost, "long double"       ) && pass;
+        ost.put('\n');
+        pass = ::vary_result_type<charT, traits, std::int8_t        >(ost, "std::int8_t"       ) && pass;
+        pass = ::vary_result_type<charT, traits, std::int16_t       >(ost, "std::int16_t"      ) && pass;
+        pass = ::vary_result_type<charT, traits, std::int32_t       >(ost, "std::int32_t"      ) && pass;
+        pass = ::vary_result_type<charT, traits, std::int64_t       >(ost, "std::int64_t"      ) && pass;
+        ost.put('\n');
+        pass = ::vary_result_type<charT, traits, std::uint8_t       >(ost, "std::uint8_t"      ) && pass;
+        pass = ::vary_result_type<charT, traits, std::uint16_t      >(ost, "std::uint16_t"     ) && pass;
+        pass = ::vary_result_type<charT, traits, std::uint32_t      >(ost, "std::uint32_t"     ) && pass;
+        pass = ::vary_result_type<charT, traits, std::uint64_t      >(ost, "std::uint64_t"     ) && pass;
+        ost.put('\n');
         return pass;
     }
 }
@@ -686,6 +839,7 @@ namespace tbx
         if (run_all_tests)
         {
             pass = omit_result_type(ost) && pass;
+            pass = bool_result_type<charT, traits>(ost) && pass;
             pass = vary_result_type(ost) && pass;
         }
         else
