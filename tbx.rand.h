@@ -131,8 +131,7 @@ namespace tbx
         >
     {};
     template <typename T>
-    bool constexpr is_bool_or_char_v
-        = tbx::is_bool_or_char<T>::value;
+    bool constexpr is_bool_or_char_v = tbx::is_bool_or_char<T>::value;
 
     //==================================================================
     // is_integral_short_int_long
@@ -296,17 +295,16 @@ namespace tbx
         // Non-standard overloads
         void srand()                         { dist_.reset(); seed_randomly(); }
         void srand(std::seed_seq const& seq) { dist_.reset(); eng_.seed(seq); }
-        auto rand(param_type const& p)       { return static_cast<result_type>(dist_(eng_, check(p))); }
+        auto rand(param_type const& p)       { check(p); return static_cast<result_type>(dist_(eng_, p)); }
         auto rand(result_type const a, result_type const b)
         {
             return static_cast<result_type>(dist_(eng_, make_param(a, b)));
         }
     private:
-        auto static constexpr& check(param_type const& params)
+        void static constexpr check(param_type const& params)
         {
-            return min <= params.a() && params.b() <= max 
-                ? params
-                : throw std::invalid_argument(
+            if (params.a() < min || max < params.b())
+                throw std::invalid_argument(
                     "tbx::rand_replacement<ResultType>::check(params): "
                     "params out of range for bool or char arguments");
         }
