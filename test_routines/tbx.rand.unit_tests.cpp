@@ -254,7 +254,7 @@ namespace
 
         std::thread thread_A([&]()
             {
-                srand(arbitrary_seed);
+                tbx::srand(arbitrary_seed);
                 for (auto& v : values)
                     v = tbx::rand();
             }
@@ -552,24 +552,29 @@ namespace
     template <typename ResultType>
     bool vary_result_type__test_thread_local()
     {
-        using seed_type = typename std::mt19937::result_type;
-        enum : seed_type { zero, one, default_seed = one };
-        tbx::srand<ResultType>(default_seed);  // Nothing in thread_A should disturb this seeding.
-
         enum : std::size_t { n_values = 42u };
-        std::array<ResultType, n_values> values{}, values_A{};
+        std::array<ResultType, n_values> values;
+
+        using seed_type = typename std::mt19937::result_type;
+        seed_type const arbitrary_seed{ std::random_device{}() };
+        tbx::srand<ResultType>(arbitrary_seed);  // Nothing in thread_A should disturb this seeding.
 
         std::thread thread_A([&]()
             {
-                for (auto& v : values_A)
+                tbx::srand<ResultType>(arbitrary_seed);
+                for (auto& v : values)
                     v = tbx::rand<ResultType>();
             }
         );
         thread_A.join();
 
-        for (auto& v : values)
-            v = tbx::rand<ResultType>();
-        auto const pass{ values == values_A };
+        auto pass{ true };
+        for (auto const& v : values)
+            if (v != tbx::rand<ResultType>())
+            {
+                pass = false;
+                break;
+            }
         assert(pass);
         return pass;
     }
