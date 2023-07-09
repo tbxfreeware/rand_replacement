@@ -34,27 +34,27 @@ For example, `tbx::srand(42u)` seeds the engine that generates `int` values, whi
 
 tbx::srand(42u); tbx::rand();  // same as tbx::srand<int>(42u); tbx::rand<int>();
 
-tbx::srand<short>(42u);     tbx::rand<short>();
-tbx::srand<int>(42u);       tbx::rand<int>();
-tbx::srand<long>(42u);      tbx::rand<long>();
-tbx::srand<long long>(42u); tbx::rand<long long>();
+tbx::srand<short>(42u);              tbx::rand<short>();
+tbx::srand<int>(42u);                tbx::rand<int>();
+tbx::srand<long>(42u);               tbx::rand<long>();
+tbx::srand<long long>(42u);          tbx::rand<long long>();
 
 tbx::srand<unsigned short>(42u);     tbx::rand<unsigned short>();
 tbx::srand<unsigned int>(42u);       tbx::rand<unsigned int>();
 tbx::srand<unsigned long>(42u);      tbx::rand<unsigned long>();
 tbx::srand<unsigned long long>(42u); tbx::rand<unsigned long long>();
 
-tbx::srand<float>(42u);       tbx::rand<float>();
-tbx::srand<double>(42u);      tbx::rand<double>();
-tbx::srand<long double>(42u); tbx::rand<long double>();
+tbx::srand<float>(42u);              tbx::rand<float>();
+tbx::srand<double>(42u);             tbx::rand<double>();
+tbx::srand<long double>(42u);        tbx::rand<long double>();
 
-tbx::srand<std::int16_t>(42u); tbx::rand<std::int16_t>();
-tbx::srand<std::int32_t>(42u); tbx::rand<std::int32_t>();
-tbx::srand<std::int64_t>(42u); tbx::rand<std::int64_t>();
+tbx::srand<std::int16_t>(42u);       tbx::rand<std::int16_t>();
+tbx::srand<std::int32_t>(42u);       tbx::rand<std::int32_t>();
+tbx::srand<std::int64_t>(42u);       tbx::rand<std::int64_t>();
 
-tbx::srand<std::uint16_t>(42u); tbx::rand<std::uint16_t>();
-tbx::srand<std::uint32_t>(42u); tbx::rand<std::uint32_t>();
-tbx::srand<std::uint64_t>(42u); tbx::rand<std::uint64_t>();
+tbx::srand<std::uint16_t>(42u);      tbx::rand<std::uint16_t>();
+tbx::srand<std::uint32_t>(42u);      tbx::rand<std::uint32_t>();
+tbx::srand<std::uint64_t>(42u);      tbx::rand<std::uint64_t>();
 
 // etc.
 ```
