@@ -106,7 +106,9 @@ namespace
                 ost << r << ' ';
             ++count[r - one];
         }
-        ost << (show_detail ? "\n\n" : "") << "Counts:\n";
+        if (show_detail)
+            ost << "\n\n";
+        ost << "Counts:\n";
         auto die{ 0 };
         for (auto const& c : count)
         {
@@ -149,15 +151,15 @@ namespace
             string_size = 20
             , gutter_width = 3
             , col_width = string_size + gutter_width
-            , max_line_length = 166
+            , line_length = 166
             , n_rows = 3
-            , n_cols = max_line_length / col_width
+            , n_cols = line_length / col_width
         };
         for (int i{ n_rows }; i--;)
         {
             for (int j{ n_cols }; j--;)
                 ost << printable_ascii_string<result_type>(string_size)
-                << std::setw(gutter_width) << ' ';
+                    << std::setw(gutter_width) << ' ';
             ost.put('\n');
         }
         ost.put('\n');
