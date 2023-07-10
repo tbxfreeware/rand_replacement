@@ -44,16 +44,15 @@ namespace
         static_assert(std::is_same_v<bool, decltype(tbx::rand<bool>())>, "");
         auto const r{ tbx::rand<bool>() };
         enum : int { n_trials = 10'000 };
-        auto pass{ false };
+        auto output_varies{ false };
         for (int i{ n_trials }; i--;)
             if (tbx::rand<bool>() != r)
             {
-                // This test demonstrates that output varies.
-                pass = true;
+                output_varies = true;
                 break;
             }
-        assert(pass);
-        return pass;
+        assert(output_varies);
+        return output_varies;
     }
     //------------------------------------------------------------------
     bool bool_result_type__test_rand__a_b(bool const a, bool const b)
@@ -201,6 +200,19 @@ namespace
             assert(upper_bound_checks);
             pass = upper_bound_checks && pass;
         }
+        if (a != b)
+        {
+            auto output_varies{ false };
+            auto const r{ tbx::rand(a, b) };
+            for (int i{ n_trials }; i--;)
+                if (tbx::rand(a, b) != r)
+                {
+                    output_varies = true;
+                    break;
+                }
+            assert(output_varies);
+            pass = pass && output_varies;
+        }
         return pass;
     }
     //------------------------------------------------------------------
@@ -244,6 +256,19 @@ namespace
             auto const upper_bound_checks{ r <= b };
             assert(upper_bound_checks);
             pass = upper_bound_checks && pass;
+        }
+        if (a != b)
+        {
+            auto output_varies{ false };
+            auto const r{ tbx::rand(p) };
+            for (int i{ n_trials }; i--;)
+                if (tbx::rand(p) != r)
+                {
+                    output_varies = true;
+                    break;
+                }
+            assert(output_varies);
+            pass = pass && output_varies;
         }
         return pass;
     }
@@ -479,6 +504,19 @@ namespace
             assert(upper_bound_checks);
             pass = upper_bound_checks && pass;
         }
+        if (a != b)
+        {
+            auto output_varies{ false };
+            auto const r{ tbx::rand<ResultType>(a, b) };
+            for (int i{ n_trials }; i--;)
+                if (tbx::rand<ResultType>(a, b) != r)
+                {
+                    output_varies = true;
+                    break;
+                }
+            assert(output_varies);
+            pass = pass && output_varies;
+        }
         return pass;
     }
     //------------------------------------------------------------------
@@ -535,6 +573,19 @@ namespace
             auto const upper_bound_checks{ r <= b };
             assert(upper_bound_checks);
             pass = upper_bound_checks && pass;
+        }
+        if (a != b)
+        {
+            auto output_varies{ false };
+            auto const r{ tbx::rand<ResultType>(p) };
+            for (int i{ n_trials }; i--;)
+                if (tbx::rand<ResultType>(p) != r)
+                {
+                    output_varies = true;
+                    break;
+                }
+            assert(output_varies);
+            pass = pass && output_varies;
         }
         return pass;
     }
