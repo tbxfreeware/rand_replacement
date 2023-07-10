@@ -49,8 +49,11 @@
 // by std::uniform_int_distribution or std::uniform_real_distribution, 
 // as well as their many type aliases from <cstdint>.
 // 
+// ResultType can also be bool, char, signed char or unsigned char.
+// 
 // Here are some examples:
 // 
+//   • tbx::rand<bool>()                  • tbx::rand<unsigned char>() 
 //   • tbx::rand<short>()                 • tbx::rand<float>() 
 //   • tbx::rand<unsigned long long>()    • tbx::rand<double>() 
 //   • tbx::rand<std::int64_t>()          • etc.
