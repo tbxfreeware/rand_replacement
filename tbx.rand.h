@@ -230,14 +230,14 @@ namespace tbx
         distribution_type dist_;
     public:
         // Drop-in replacements for rand(), RAND_MAX, and srand(seed)
-        auto rand()                          { return dist_(eng_); }
-        auto rand_max()                      { return dist_.max(); }
-        void srand(seed_type const seed)     { dist_.reset(); eng_.seed(seed); }
+        auto rand()                           { return dist_(eng_); }
+        auto rand_max()                       { return dist_.max(); }
+        void srand(seed_type const seed)      { dist_.reset(); eng_.seed(seed); }
 
         // Non-standard overloads
-        void srand()                         { dist_.reset(); seed_randomly(); }
-        void srand(std::seed_seq const& seq) { dist_.reset(); eng_.seed(seq); }
-        auto rand(param_type const& p)       { return dist_(eng_, p); }
+        void srand()                          { dist_.reset(); seed_randomly(); }
+        void srand(std::seed_seq const& sseq) { dist_.reset(); eng_.seed(sseq); }
+        auto rand(param_type const& p)        { return dist_(eng_, p); }
         auto rand(result_type const a, result_type const b)
         {
             return dist_(eng_, make_param(a, b));
@@ -288,14 +288,14 @@ namespace tbx
         distribution_type dist_{ zero, max };
     public:
         // Drop-in replacements for rand(), RAND_MAX, and srand(seed)
-        auto rand()                          { return static_cast<result_type>(dist_(eng_)); }
-        auto rand_max()                      { return std::numeric_limits<result_type>::max(); }
-        void srand(seed_type const seed)     { dist_.reset(); eng_.seed(seed); }
+        auto rand()                           { return static_cast<result_type>(dist_(eng_)); }
+        auto rand_max()                       { return std::numeric_limits<result_type>::max(); }
+        void srand(seed_type const seed)      { dist_.reset(); eng_.seed(seed); }
 
         // Non-standard overloads
-        void srand()                         { dist_.reset(); seed_randomly(); }
-        void srand(std::seed_seq const& seq) { dist_.reset(); eng_.seed(seq); }
-        auto rand(param_type const& p)       { check(p); return static_cast<result_type>(dist_(eng_, p)); }
+        void srand()                          { dist_.reset(); seed_randomly(); }
+        void srand(std::seed_seq const& sseq) { dist_.reset(); eng_.seed(sseq); }
+        auto rand(param_type const& p)        { check(p); return static_cast<result_type>(dist_(eng_, p)); }
         auto rand(result_type const a, result_type const b)
         {
             return static_cast<result_type>(dist_(eng_, make_param(a, b)));
@@ -381,10 +381,10 @@ namespace tbx
     }
     //------------------------------------------------------------------
     template <typename ResultType = int>
-    inline void srand(std::seed_seq const& seq)
+    inline void srand(std::seed_seq const& sseq)
     {
         static_assert(tbx::is_arithmetic_v<ResultType>, "");
-        tbx::rr<ResultType>().srand(seq);  // seed from std::seed_seq
+        tbx::rr<ResultType>().srand(sseq);  // seed from std::seed_seq
     }
     //------------------------------------------------------------------
 }   // end namespace tbx
