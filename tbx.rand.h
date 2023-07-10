@@ -259,7 +259,7 @@ namespace tbx
         {
             std::random_device rd;
             std::stringstream ss;
-            for (std::size_t i{ std::mt19937::state_size }; i--;)
+            for (auto i{ std::mt19937::state_size }; i--;)
                 ss << rd() << ' ';
             ss >> eng_;
         }
@@ -318,7 +318,7 @@ namespace tbx
         {
             std::random_device rd;
             std::stringstream ss;
-            for (std::size_t i{ std::mt19937::state_size }; i--;)
+            for (auto i{ std::mt19937::state_size }; i--;)
                 ss << rd() << ' ';
             ss >> eng_;
         }
