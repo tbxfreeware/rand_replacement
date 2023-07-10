@@ -157,6 +157,18 @@ namespace tbx
         = tbx::is_integral_short_int_long<T>::value;
 
     //==================================================================
+    // is_integral
+    //==================================================================
+    template <typename T>
+    struct is_integral : std::integral_constant
+        < bool
+        , tbx::is_integral_short_int_long_v<T> || tbx::is_bool_or_char_v<T>
+        >
+    {};
+    template <typename T>
+    bool constexpr is_integral_v = tbx::is_integral<T>::value;
+
+    //==================================================================
     // is_arithmetic_short_int_long
     //==================================================================
     template <typename T>
@@ -175,11 +187,28 @@ namespace tbx
     template <typename T>
     struct is_arithmetic : std::integral_constant
         < bool
-        , tbx::is_arithmetic_short_int_long_v<T> || tbx::is_bool_or_char_v<T>
+        , tbx::is_integral_v<T> || std::is_floating_point_v<T>
         >
     {};
     template <typename T>
     bool constexpr is_arithmetic_v = tbx::is_arithmetic<T>::value;
+
+    //==================================================================
+    // distribution_result
+    //==================================================================
+    template <typename ResultType, typename = void>
+    struct distribution_result
+    {
+        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
+        using type = ResultType;
+    };
+    template <typename ResultType>
+    struct distribution_result<ResultType, std::enable_if_t<tbx::is_bool_or_char_v<ResultType>>>
+    {
+        using type = std::int_fast16_t;
+    };
+    template <typename ResultType>
+    using distribution_result_t = typename tbx::distribution_result<ResultType>::type;
 
     //==================================================================
     // uniform_distribution
@@ -187,8 +216,8 @@ namespace tbx
     template <typename ResultType, typename = void>
     struct uniform_distribution
     {
-        static_assert(tbx::is_integral_short_int_long_v<ResultType>, "");
-        using type = std::uniform_int_distribution<ResultType>;
+        static_assert(tbx::is_integral_v<ResultType>, "");
+        using type = std::uniform_int_distribution<tbx::distribution_result_t<ResultType>>;
     };
     template <typename ResultType>
     struct uniform_distribution<ResultType, std::enable_if_t<std::is_floating_point_v<ResultType>>>
@@ -201,19 +230,8 @@ namespace tbx
     //==================================================================
     // param_type
     //==================================================================
-    template <typename ResultType, typename = void>
-    struct param
-    {
-        static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
-        using type = typename tbx::uniform_distribution_t<ResultType>::param_type;
-    };
     template <typename ResultType>
-    struct param<ResultType, std::enable_if_t<tbx::is_bool_or_char_v<ResultType>>>
-    {
-        using type = typename std::uniform_int_distribution<std::int_fast16_t>::param_type;
-    };
-    template <typename ResultType>
-    using param_type = typename tbx::param<ResultType>::type;
+    using param_type = typename tbx::uniform_distribution_t<ResultType>::param_type;
 
     //==================================================================
     // rand_replacement
@@ -277,15 +295,15 @@ namespace tbx
     public:
         using urbg_type = std::mt19937;
         using seed_type = typename std::mt19937::result_type;
-        using distribution_type = std::uniform_int_distribution<std::int_fast16_t>;
+        using distribution_type = tbx::uniform_distribution_t<ResultType>;
         using param_type = typename distribution_type::param_type;
         using result_type = ResultType;
     private:
-        enum : std::int_fast16_t
+        enum : tbx::distribution_result_t<ResultType>
         {
             zero
-            , max = static_cast<std::int_fast16_t>(std::numeric_limits<result_type>::max())
-            , min = static_cast<std::int_fast16_t>(std::numeric_limits<result_type>::min())
+            , max = static_cast<tbx::distribution_result_t<ResultType>>(std::numeric_limits<result_type>::max())
+            , min = static_cast<tbx::distribution_result_t<ResultType>>(std::numeric_limits<result_type>::min())
         };
         urbg_type eng_{ seed_type{1u} };  // By default, rand() uses seed 1u.
         distribution_type dist_{ zero, max };
@@ -313,8 +331,8 @@ namespace tbx
         }
         auto static constexpr make_param(result_type const a, result_type const b)
         {
-            auto const aa{ static_cast<std::int_fast16_t>(a) };
-            auto const bb{ static_cast<std::int_fast16_t>(b) };
+            auto const aa{ static_cast<tbx::distribution_result_t<ResultType>>(a) };
+            auto const bb{ static_cast<tbx::distribution_result_t<ResultType>>(b) };
             return aa < bb ? param_type{ aa, bb } : param_type{ bb, aa };
         }
         void seed_randomly()
