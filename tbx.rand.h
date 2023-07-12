@@ -197,14 +197,12 @@ namespace tbx
     // distribution_result
     //==================================================================
     template <typename ResultType, typename = void>
-    struct distribution_result
-    {
+    struct distribution_result {
         static_assert(tbx::is_arithmetic_short_int_long_v<ResultType>, "");
         using type = ResultType;
     };
     template <typename ResultType>
-    struct distribution_result<ResultType, std::enable_if_t<tbx::is_bool_or_char_v<ResultType>>>
-    {
+    struct distribution_result<ResultType, std::enable_if_t<tbx::is_bool_or_char_v<ResultType>>> {
         using type = std::int_fast16_t;
     };
     template <typename ResultType>
@@ -214,14 +212,12 @@ namespace tbx
     // uniform_distribution
     //==================================================================
     template <typename ResultType, typename = void>
-    struct uniform_distribution
-    {
+    struct uniform_distribution {
         static_assert(tbx::is_integral_v<ResultType>, "");
         using type = std::uniform_int_distribution<tbx::distribution_result_t<ResultType>>;
     };
     template <typename ResultType>
-    struct uniform_distribution<ResultType, std::enable_if_t<std::is_floating_point_v<ResultType>>>
-    {
+    struct uniform_distribution<ResultType, std::enable_if_t<std::is_floating_point_v<ResultType>>> {
         using type = std::uniform_real_distribution<ResultType>;
     };
     template <typename ResultType>
@@ -232,6 +228,60 @@ namespace tbx
     //==================================================================
     template <typename ResultType>
     using param_type = typename tbx::uniform_distribution_t<ResultType>::param_type;
+
+    //==================================================================
+    // seed_seq_rd
+    //==================================================================
+    class seed_seq_rd
+    {
+        // This class mimics the interface of std::seed_seq, but 
+        // uses std::random_device to generate seeds. 
+        //
+        // It does not use concepts or SFINAE to enforce any 
+        // requirements on its template arguments. Other than that, 
+        // it complies with all requirements of a seed sequence as 
+        // defined in the C++ standard.
+    public:
+        using result_type = typename std::random_device::result_type;
+    private:
+        // No matter what ctor you use, all you get is this array 
+        // with one element. Best practice, therefore, is to use the 
+        // default ctor.
+        enum : std::size_t { zero, one };
+        std::array<result_type, one> seeds{};
+    public:
+        seed_seq_rd() noexcept
+            = default;
+        template <typename InputIt>
+        seed_seq_rd(InputIt begin, InputIt end)
+        {}
+        template <typename T>
+        seed_seq_rd(std::initializer_list<T> li)
+        {}
+        seed_seq_rd(seed_seq_rd const&)
+            = delete;
+        seed_seq_rd& operator=(seed_seq_rd const&)
+            = delete;
+        template <typename RandomIt>
+        void generate(RandomIt begin, RandomIt end)
+        {
+            std::random_device rd;
+            while (begin != end)
+            {
+                *begin = rd();
+                ++begin;
+            }
+        }
+        template <typename OutputIt>
+        void param(OutputIt dest) const
+        {
+            *dest = seeds.front();
+        }
+        auto size() const noexcept
+        {
+            return seeds.size();
+        }
+    };
 
     //==================================================================
     // rand_replacement
@@ -256,11 +306,10 @@ namespace tbx
         void srand(seed_type const seed)      { dist_.reset(); eng_.seed(seed); }
 
         // Non-standard overloads
-        void srand()                          { dist_.reset(); seed_randomly(); }
+        void srand()                          { dist_.reset(); tbx::seed_seq_rd s; eng_.seed(s); }
         void srand(std::seed_seq const& sseq) { dist_.reset(); eng_.seed(sseq); }
         auto rand(param_type const& p)        { return dist_(eng_, p); }
-        auto rand(result_type const a, result_type const b)
-        {
+        auto rand(result_type const a, result_type const b) {
             return dist_(eng_, make_param(a, b));
         }
     private:
@@ -275,14 +324,6 @@ namespace tbx
                     "tbx::rand_replacement<ResultType>::make_param(a, b): "
                     "floating-point arguments require a != b")
             };
-        }
-        void seed_randomly()
-        {
-            std::random_device rd;
-            std::stringstream ss;
-            for (auto i{ std::mt19937::state_size }; i--;)
-                ss << rd() << ' ';
-            ss >> eng_;
         }
     };
 
@@ -299,49 +340,47 @@ namespace tbx
         using param_type = typename distribution_type::param_type;
         using result_type = ResultType;
     private:
-        enum : tbx::distribution_result_t<ResultType>
-        {
-            zero
-            , max = static_cast<tbx::distribution_result_t<ResultType>>(std::numeric_limits<result_type>::max())
-            , min = static_cast<tbx::distribution_result_t<ResultType>>(std::numeric_limits<result_type>::min())
-        };
+        auto static constexpr drt(result_type const r) {
+            return static_cast<tbx::distribution_result_t<result_type>>(r);
+        }
+        auto static constexpr rt(tbx::distribution_result_t<result_type> const r) {
+            return static_cast<result_type>(r);
+        }
+        auto static constexpr rt_max() {
+            return std::numeric_limits<result_type>::max();
+        }
+        auto static constexpr rt_min() {
+            return std::numeric_limits<result_type>::min();
+        }
+        auto static constexpr rt_default_b() {
+            return std::is_floating_point_v<result_type> ? result_type{ 1 } : rt_max();
+        }
         urbg_type eng_{ seed_type{1u} };  // By default, rand() uses seed 1u.
-        distribution_type dist_{ zero, max };
+        distribution_type dist_{ drt(result_type{}), drt(rt_default_b()) };
     public:
         // Drop-in replacements for rand(), RAND_MAX, and srand(seed)
-        auto rand()                           { return static_cast<result_type>(dist_(eng_)); }
-        auto rand_max()                       { return std::numeric_limits<result_type>::max(); }
+        auto rand()                           { return rt(dist_(eng_)); }
+        auto rand_max()                       { return rt_max(); }
         void srand(seed_type const seed)      { dist_.reset(); eng_.seed(seed); }
 
         // Non-standard overloads
-        void srand()                          { dist_.reset(); seed_randomly(); }
+        void srand()                          { dist_.reset(); tbx::seed_seq_rd s; eng_.seed(s); }
         void srand(std::seed_seq const& sseq) { dist_.reset(); eng_.seed(sseq); }
-        auto rand(param_type const& p)        { check(p); return static_cast<result_type>(dist_(eng_, p)); }
-        auto rand(result_type const a, result_type const b)
-        {
-            return static_cast<result_type>(dist_(eng_, make_param(a, b)));
+        auto rand(param_type const& p)        { check(p); return rt(dist_(eng_, p)); }
+        auto rand(result_type const a, result_type const b) {
+            return rt(dist_(eng_, make_param(a, b)));
         }
     private:
-        void static constexpr check(param_type const& params)
-        {
-            if (params.a() < min || max < params.b())
+        void static constexpr check(param_type const& params) {
+            if (params.a() < drt(rt_min()) || drt(rt_max()) < params.b())
                 throw std::invalid_argument(
                     "tbx::rand_replacement<ResultType>::check(params): "
                     "params out of range for bool or char arguments");
         }
-        auto static constexpr make_param(result_type const a, result_type const b)
-        {
-            auto const aa{ static_cast<tbx::distribution_result_t<ResultType>>(a) };
-            auto const bb{ static_cast<tbx::distribution_result_t<ResultType>>(b) };
-            return aa < bb ? param_type{ aa, bb } : param_type{ bb, aa };
-        }
-        void seed_randomly()
-        {
-            std::random_device rd;
-            std::stringstream ss;
-            for (auto i{ std::mt19937::state_size }; i--;)
-                ss << rd() << ' ';
-            ss >> eng_;
+        auto static constexpr make_param(result_type const a, result_type const b) {
+            auto const aa{ drt(a) };
+            auto const bb{ drt(b) };
+            return a < b ? param_type{ aa, bb } : param_type{ bb, aa };
         }
     };
 
