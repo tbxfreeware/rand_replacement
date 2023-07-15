@@ -888,9 +888,9 @@ namespace tbx
         ost << "Unit Tests - tbx.rand.h \n";
         if (run_all_tests)
         {
-            pass = ::omit_result_type(ost) && pass;
-            pass = ::bool_result_type<charT, traits>(ost) && pass;  // FIX: Why does template type-deduction fail?
-            pass = ::vary_result_type(ost) && pass;
+            pass = ::omit_result_type<charT, traits>(ost) && pass;
+            pass = ::bool_result_type<charT, traits>(ost) && pass;
+            pass = ::vary_result_type<charT, traits>(ost) && pass;
         }
         else
         {
