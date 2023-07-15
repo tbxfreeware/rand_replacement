@@ -237,10 +237,9 @@ namespace tbx
         // This class mimics the interface of std::seed_seq, but 
         // uses std::random_device to generate seeds. 
         //
-        // It does not use concepts or SFINAE to enforce any 
-        // requirements on its template arguments. Other than that, 
-        // it complies with all requirements of a seed sequence as 
-        // defined in the C++ standard.
+        // It performs only minimal checking of its template arguments. 
+        // Other than that, it complies with all requirements of a seed 
+        // sequence as defined in the C++ standard.
     public:
         using result_type = typename std::random_device::result_type;
     private:
@@ -252,33 +251,35 @@ namespace tbx
     public:
         seed_seq_rd() noexcept
             = default;
-        template <typename InputIt>
-        seed_seq_rd(InputIt begin, InputIt end)
-        {}
-        template <typename T>
-        seed_seq_rd(std::initializer_list<T> li)
-        {}
+        template< typename InputIt >
+        seed_seq_rd(InputIt begin, InputIt end) {
+            using value_type = typename std::iterator_traits<InputIt>::value_type;
+            static_assert(std::is_integral_v<value_type>, "");
+        }
+        template< typename T >
+        seed_seq_rd(std::initializer_list<T> li) {
+            using value_type = typename std::initializer_list<T>::value_type;
+            static_assert(std::is_integral_v<value_type>, "");
+        }
         seed_seq_rd(seed_seq_rd const&)
             = delete;
         seed_seq_rd& operator=(seed_seq_rd const&)
             = delete;
-        template <typename RandomIt>
-        void generate(RandomIt begin, RandomIt end)
-        {
+        template< typename RandomIt >
+        void generate(RandomIt begin, RandomIt end) {
+            using value_type = typename std::iterator_traits<RandomIt>::value_type;
+            static_assert(std::is_integral_v<value_type>, "");
+            static_assert(std::is_unsigned_v<value_type>, "");
+            static_assert(sizeof(value_type) >= sizeof(std::uint_least32_t), "");
             std::random_device rd;
             while (begin != end)
-            {
-                *begin = rd();
-                ++begin;
-            }
+                *begin++ = rd();
         }
         template <typename OutputIt>
-        void param(OutputIt dest) const
-        {
+        void param(OutputIt dest) const {
             *dest = seeds.front();
         }
-        auto size() const noexcept
-        {
+        auto size() const noexcept {
             return seeds.size();
         }
     };
