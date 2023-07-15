@@ -298,10 +298,11 @@ namespace tbx
         using param_type = typename distribution_type::param_type;
         using result_type = ResultType;
     private:
-        auto static constexpr const default_seed{ seed_type{1u} };
         urbg_type eng_{ default_seed };
         distribution_type dist_;
     public:
+        auto static constexpr const default_seed{ seed_type{1u} };
+
         // Drop-in replacements for rand(), RAND_MAX, and srand(seed)
         auto rand()                           { return dist_(eng_); }
         auto rand_max()                       { return dist_.max(); }
@@ -357,10 +358,11 @@ namespace tbx
         auto static constexpr rt_default_b() {
             return std::is_floating_point_v<result_type> ? result_type{ 1 } : rt_max();
         }
-        auto static constexpr const default_seed{ seed_type{1u} };
         urbg_type eng_{ default_seed };
         distribution_type dist_{ drt(result_type{}), drt(rt_default_b()) };
     public:
+        auto static constexpr const default_seed{ seed_type{1u} };
+
         // Drop-in replacements for rand(), RAND_MAX, and srand(seed)
         auto rand()                           { return rt(dist_(eng_)); }
         auto rand_max()                       { return rt_max(); }
