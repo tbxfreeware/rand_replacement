@@ -35,6 +35,20 @@
 #include "tbx.rand.h"
 
 //======================================================================
+// Helper Functions and Type Aliases
+//======================================================================
+namespace
+{
+    using urbg_type = std::mt19937;
+    using seed_type = typename std::mt19937::result_type;
+
+    inline seed_type make_arbitrary_seed()
+    {
+        std::random_device static thread_local rd;
+        return rd();
+    }
+}
+//======================================================================
 // Test Routines - ResultType bool
 //======================================================================
 namespace
@@ -91,7 +105,7 @@ namespace
         return pass;
     }
     //------------------------------------------------------------------
-    bool bool_result_type__test_rand__param(bool const a, bool const b)
+    bool bool_result_type__test_rand__params(bool const a, bool const b)
     {
         int const aa{ static_cast<int>(a) }, bb{ static_cast<int>(b) };
         tbx::param_type<int> p(aa, bb);
@@ -120,12 +134,12 @@ namespace
         return pass;
     }
     //------------------------------------------------------------------
-    bool bool_result_type__test_rand__param()
+    bool bool_result_type__test_rand__params()
     {
         auto pass{ true };
-        pass = bool_result_type__test_rand__param(false, true) && pass;
-        pass = bool_result_type__test_rand__param(false, false) && pass;
-        pass = bool_result_type__test_rand__param(true, true) && pass;
+        pass = bool_result_type__test_rand__params(false, true) && pass;
+        pass = bool_result_type__test_rand__params(false, false) && pass;
+        pass = bool_result_type__test_rand__params(true, true) && pass;
         return pass;
     }
     //------------------------------------------------------------------
@@ -237,7 +251,7 @@ namespace
         return pass;
     }
     //------------------------------------------------------------------
-    bool omit_result_type__test_rand__param(int const a, int const b)
+    bool omit_result_type__test_rand__params(int const a, int const b)
     {
         using ResultType = int;
         tbx::param_type<ResultType> p{ a, b };
@@ -273,19 +287,19 @@ namespace
         return pass;
     }
     //------------------------------------------------------------------
-    bool omit_result_type__test_rand__param()
+    bool omit_result_type__test_rand__params()
     {
         using ResultType = int;
         auto pass{ true };
-        pass = ::omit_result_type__test_rand__param(1, 6) && pass;    // a couple of "normal" cases
-        pass = ::omit_result_type__test_rand__param(-1, +1) && pass;
-        pass = ::omit_result_type__test_rand__param(                  // the  rest are "edge" cases
+        pass = ::omit_result_type__test_rand__params(1, 6) && pass;    // a couple of "normal" cases
+        pass = ::omit_result_type__test_rand__params(-1, +1) && pass;
+        pass = ::omit_result_type__test_rand__params(                  // the  rest are "edge" cases
             std::numeric_limits<ResultType>::min(),
             std::numeric_limits<ResultType>::max()) && pass;
-        pass = ::omit_result_type__test_rand__param(
+        pass = ::omit_result_type__test_rand__params(
             std::numeric_limits<ResultType>::min(),
             std::numeric_limits<ResultType>::min()) && pass;
-        pass = ::omit_result_type__test_rand__param(
+        pass = ::omit_result_type__test_rand__params(
             tbx::rand_max(),
             tbx::rand_max()) && pass;
         return true;
@@ -328,8 +342,7 @@ namespace
         enum : std::size_t { n_trials = 42u };
         std::array<ResultType, n_trials> values;
 
-        using seed_type = typename std::mt19937::result_type;
-        seed_type const arbitrary_seed{ std::random_device{}() };
+        auto const arbitrary_seed{ ::make_arbitrary_seed() };
         static_assert(std::is_same_v<void, decltype(tbx::srand(arbitrary_seed))>, "");
 
         tbx::srand(arbitrary_seed);
@@ -377,28 +390,23 @@ namespace
     {
         using ResultType = int;
         enum : std::size_t { n_values = 42u };
-        std::array<ResultType, n_values> values;
+        std::array<ResultType, n_values> values, values_A;
 
-        using seed_type = typename std::mt19937::result_type;
-        seed_type const arbitrary_seed{ std::random_device{}() };
+        auto const arbitrary_seed{ ::make_arbitrary_seed() };
         tbx::srand(arbitrary_seed);  // Nothing in thread_A should disturb this seeding.
 
         std::thread thread_A([&]()
             {
                 tbx::srand(arbitrary_seed);
-                for (auto& v : values)
+                for (auto& v : values_A)
                     v = tbx::rand();
             }
         );
         thread_A.join();
 
-        auto pass{ true };
-        for (auto const& v : values)
-            if (v != tbx::rand())
-            {
-                pass = false;
-                break;
-            }
+        for (auto& v : values)
+            v = tbx::rand();
+        auto const pass{ values == values_A };
         assert(pass);
         return pass;
     }
@@ -417,7 +425,6 @@ namespace
                 std::array<ResultType, n_trials> values;
                 for (auto& v : values)
                     v = tbx::rand();
-                using seed_type = typename std::mt19937::result_type;
                 enum : seed_type { zero, one, default_seed = one };
                 tbx::srand(default_seed);
                 for (auto const& v : values)
@@ -555,7 +562,7 @@ namespace
     }
     //------------------------------------------------------------------
     template <typename ResultType>
-    bool vary_result_type__test_rand__param(ResultType const a, ResultType const b)
+    bool vary_result_type__test_rand__params(ResultType const a, ResultType const b)
     {
         tbx::param_type<ResultType> p{ a, b };
         static_assert(std::is_same_v<ResultType, decltype(tbx::rand<ResultType>(p))>, "");
@@ -591,27 +598,27 @@ namespace
     }
     //------------------------------------------------------------------
     template <typename ResultType>
-    bool vary_result_type__test_rand__param()
+    bool vary_result_type__test_rand__params()
     {
         auto pass{ true };
-        pass = ::vary_result_type__test_rand__param<ResultType>(      // a couple of "normal" cases, ...
+        pass = ::vary_result_type__test_rand__params<ResultType>(      // a couple of "normal" cases, ...
             static_cast<ResultType>(1),
             static_cast<ResultType>(6)) && pass;
         if /* constexpr */ (!std::is_unsigned_v<ResultType>)
         {
-            pass = ::vary_result_type__test_rand__param<ResultType>(
+            pass = ::vary_result_type__test_rand__params<ResultType>(
                 static_cast<ResultType>(-1),
                 static_cast<ResultType>(+1)) && pass;
         }
-        pass = ::vary_result_type__test_rand__param<ResultType>(      // and the the rest are all "edge" cases
+        pass = ::vary_result_type__test_rand__params<ResultType>(      // and the the rest are all "edge" cases
             std::numeric_limits<ResultType>::min(),
             std::numeric_limits<ResultType>::max()) && pass;
         if /* constexpr */ (!std::is_floating_point_v<ResultType>)
         {
-            pass = ::vary_result_type__test_rand__param<ResultType>(
+            pass = ::vary_result_type__test_rand__params<ResultType>(
                 std::numeric_limits<ResultType>::max(),
                 std::numeric_limits<ResultType>::max()) && pass;
-            pass = ::vary_result_type__test_rand__param<ResultType>(
+            pass = ::vary_result_type__test_rand__params<ResultType>(
                 tbx::rand_max<ResultType>(),
                 tbx::rand_max<ResultType>()) && pass;
         }
@@ -658,13 +665,11 @@ namespace
         // seeding is not random, and we failed this test.
         assert(false);
         return false;
-    }
-    //------------------------------------------------------------------
+    }    //------------------------------------------------------------------
     template <typename ResultType>
     bool vary_result_type__test_srand__seed()
     {
-        using seed_type = typename std::mt19937::result_type;
-        seed_type const arbitrary_seed{ std::random_device{}() };
+        auto const arbitrary_seed{ ::make_arbitrary_seed() };
         static_assert(std::is_same_v<void, decltype(tbx::srand<ResultType>(arbitrary_seed))>, "");
 
         enum : std::size_t { n_trials = 42u };
@@ -715,28 +720,23 @@ namespace
     bool vary_result_type__test_thread_local()
     {
         enum : std::size_t { n_values = 42u };
-        std::array<ResultType, n_values> values;
+        std::array<ResultType, n_values> values, values_A;
 
-        using seed_type = typename std::mt19937::result_type;
-        seed_type const arbitrary_seed{ std::random_device{}() };
+        auto const arbitrary_seed{ ::make_arbitrary_seed() };
         tbx::srand<ResultType>(arbitrary_seed);  // Nothing in thread_A should disturb this seeding.
 
         std::thread thread_A([&]()
             {
                 tbx::srand<ResultType>(arbitrary_seed);
-                for (auto& v : values)
+                for (auto& v : values_A)
                     v = tbx::rand<ResultType>();
             }
         );
         thread_A.join();
 
-        auto pass{ true };
-        for (auto const& v : values)
-            if (v != tbx::rand<ResultType>())
-            {
-                pass = false;
-                break;
-            }
+        for (auto& v : values)
+            v = tbx::rand<ResultType>();
+        auto const pass{ values == values_A };
         assert(pass);
         return pass;
     }
@@ -755,7 +755,6 @@ namespace
                 std::array<ResultType, n_trials> values;
                 for (auto& v : values)
                     v = tbx::rand<ResultType>();
-                using seed_type = typename std::mt19937::result_type;
                 tbx::srand<ResultType>(seed_type{ 1u });
                 for (auto const& v : values)
                     if (tbx::rand<ResultType>() != v)
@@ -778,10 +777,10 @@ namespace
     bool bool_result_type(std::basic_ostream<char, traits>& ost)
     {
         auto pass{ true };
-        pass = ::bool_result_type__test_rand_max    () && pass;
-        pass = ::bool_result_type__test_rand        () && pass;
-        pass = ::bool_result_type__test_rand__a_b   () && pass;
-        pass = ::bool_result_type__test_rand__param () && pass;
+        pass = ::bool_result_type__test_rand_max     () && pass;
+        pass = ::bool_result_type__test_rand         () && pass;
+        pass = ::bool_result_type__test_rand__a_b    () && pass;
+        pass = ::bool_result_type__test_rand__params () && pass;
 
         pass = ::vary_result_type__test_srand              <bool>() && pass;
         pass = ::vary_result_type__test_srand__seed        <bool>() && pass;
@@ -804,7 +803,7 @@ namespace
         pass = ::omit_result_type__test_rand_max           () && pass;
         pass = ::omit_result_type__test_rand               () && pass;
         pass = ::omit_result_type__test_rand__a_b          () && pass;
-        pass = ::omit_result_type__test_rand__param        () && pass;
+        pass = ::omit_result_type__test_rand__params       () && pass;
         pass = ::omit_result_type__test_srand              () && pass;
         pass = ::omit_result_type__test_srand__seed        () && pass;
         pass = ::omit_result_type__test_srand__seed_seq    () && pass;
@@ -828,7 +827,7 @@ namespace
         pass = ::vary_result_type__test_rand_max           <ResultType>() && pass;
         pass = ::vary_result_type__test_rand               <ResultType>() && pass;
         pass = ::vary_result_type__test_rand__a_b          <ResultType>() && pass;
-        pass = ::vary_result_type__test_rand__param        <ResultType>() && pass;
+        pass = ::vary_result_type__test_rand__params       <ResultType>() && pass;
         pass = ::vary_result_type__test_srand              <ResultType>() && pass;
         pass = ::vary_result_type__test_srand__seed        <ResultType>() && pass;
         pass = ::vary_result_type__test_srand__seed_seq    <ResultType>() && pass;
@@ -889,9 +888,9 @@ namespace tbx
         ost << "Unit Tests - tbx.rand.h \n";
         if (run_all_tests)
         {
-            pass = omit_result_type(ost) && pass;
-            pass = bool_result_type<charT, traits>(ost) && pass;
-            pass = vary_result_type(ost) && pass;
+            pass = ::omit_result_type(ost) && pass;
+            pass = ::bool_result_type<charT, traits>(ost) && pass;  // FIX: Why does template type-deduction fail?
+            pass = ::vary_result_type(ost) && pass;
         }
         else
         {
