@@ -17,6 +17,8 @@ This function takes a random number engine as argument, and seeds it with random
 
 ## class seed_seq_rd
 This class mimics the interface of `std::seed_seq`, but uses `std::random_device` to generate seeds. Objects of this type are seed sequences that can be used as arguments to member function `seed` in a random number engine.
+
+Function `seed_randomly` is a trivial wrapper around a `seed_seq_rd` object.
 ````cpp
 // Example: Seed mt19937 with random seeds from std::random_device.
    std::mt19937 mt;

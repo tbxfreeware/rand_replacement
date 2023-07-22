@@ -32,7 +32,7 @@
 // 
 // They work with any random number engine that can be seeded using 
 // a seed sequence, including all the engines in the C++ Standard 
-// Library.
+// Library, and many others, as well.
 // 
 // The tools use only the features of C++14, nothing later.
 //======================================================================
