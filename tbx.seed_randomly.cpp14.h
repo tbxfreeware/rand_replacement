@@ -41,10 +41,6 @@
 // This function takes a random number engine as argument, and seeds 
 // it with random seeds generated from std::random_device.
 // 
-// Declaration:
-//    template< typename RandomNumberEngine >
-//    void seed_randomly( RandomNumberEngine& );
-// 
 // Example: Seed mt19937 with random seeds from std::random_device.
 //    std::mt19937 mt;
 //    tbx::seed_randomly( mt );
