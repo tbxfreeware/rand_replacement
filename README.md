@@ -25,9 +25,9 @@ This class mimics the interface of `std::seed_seq`, but uses `std::random_device
 // Example: Seed mt19937 with random seeds from std::random_device.
    std::mt19937 mt;
    tbx::seed_seq_rd s;
-   mt.seed(s);
+   mt.seed( s );
 
 // Example: Seed pcg32, one of the PCG engines by Melissa O'Neill.
    pcg32 e;
-   e.seed(s);  // seed_seq_rd object can be used more than once.
+   e.seed( s );  // seed_seq_rd object can be used more than once.
 ````
