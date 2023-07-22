@@ -1,5 +1,5 @@
 # seed_randomly
-Header `tbx.seed_randomly.cpp14.h` provides tools for randomly seeding random number engines in the C++ Standard Library. They work with any random number engine that can be seeded using a seed sequence, including all the engines in the C++ Standard Library.
+Header `tbx.seed_randomly.cpp14.h` provides tools for randomly seeding random number engines in the C++ Standard Library. They work with any random number engine that can be seeded using a seed sequence, including all the engines in the C++ Standard Library, and many others, as well.
 
 The tools use only the features of C++14, nothing later.
 
@@ -29,5 +29,5 @@ This class mimics the interface of `std::seed_seq`, but uses `std::random_device
 
 // Example: Seed pcg32, one of the PCG engines by Melissa O'Neill.
    pcg32 e;
-   e.seed( s );  // seed_seq_rd object can be used more than once.
+   e.seed( s );  // seed_seq_rd object can be reused.
 ````
