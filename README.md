@@ -1,7 +1,7 @@
 # Random numbers in C++14
 `tbx.rand.h` provides feature-rich replacements for `rand()` and `srand(seed)` from the standard library header `<cstdlib>`.
 
-
+&nbsp;
 ## Simple user interface
 - Without template arguments, `tbx::rand()` and `tbx::srand(seed)` behave the same as the corresponding functions in `<cstdlib>`.
 
@@ -18,7 +18,7 @@ tbx::srand<double>();  // randomly seed the engine used for doubles
 tbx::rand<double>(p);  // slightly faster than tbx::rand<double>(-180.0, 180.0);
 ```
 
-
+&nbsp;
 ## Expanded seeding options
 There are three ways to seed the `std::mt19937` random number engine used by `tbx.rand.h`.
 - `tbx::srand(seed)` uses an `unsigned int` to seed the engine.
@@ -29,7 +29,7 @@ There are three ways to seed the `std::mt19937` random number engine used by `tb
 
 For example, `tbx::srand(42u)` seeds the engine that generates `int` values, while `tbx::srand<double>(42u)` seeds the engine that generates `double` values.
 
-
+&nbsp;
 ## A variety of result types
 `tbx.rand.h` works with any `result_type` accepted by `std::uniform_int_distribution` or `std::uniform_real_distribution`, as well as their many type aliases from `<cstdint>`. It also works with `bool` and `char` types.
 ```cpp
@@ -69,14 +69,14 @@ tbx::srand<std::uint64_t>(42u);      tbx::rand<std::uint64_t>();
 // etc.
 ```
 
-
+&nbsp;
 ## Thread safe
 All functions are "thread_local," meaning that each thread where `rand()` is called has a random number engine and distribution of its own. Threads that call functions in the `rand()` family do not contend with other threads that use `rand()`, so no locking is necessary. 
 
-
+&nbsp;
 ## Easy installation
 Just copy the header file `tbx.rand.h` to your project folder.
 
-
+&nbsp;
 ## Comprehensive test routines
 A comprehensive set of unit tests systematically vary the result type, testing each overload of `rand()`, `srand()`, and `rand_max()` for every one. A small set of use tests demonstrates the functions in action.
