@@ -75,7 +75,7 @@ All functions are "thread_local," meaning that each thread where `rand()` is cal
 
 &nbsp;
 ## Implicit seeding
-If one of the overloads of `rand()` is called in a given thread before it has been seeded in that thread, it behaves as if it had been seeded with `seed(1u)`.
+If one of the overloads of `rand()` is called in a given thread before it has been seeded in that thread, it behaves as if it had been seeded with `seed(1u)`. This mimics the behavior of `rand()` in the C++ Standard Library.
 ````cpp
 tbx::rand()                // implicitly seeded with srand(1u);
 tbx::rand<double>()        // implicitly seeded with srand<double>(1u);
