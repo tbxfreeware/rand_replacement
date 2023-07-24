@@ -74,9 +74,29 @@ tbx::srand<std::uint64_t>(42u);      tbx::rand<std::uint64_t>();
 All functions are "thread_local," meaning that each thread where `rand()` is called has a random number engine and distribution of its own. Threads that call functions in the `rand()` family do not contend with other threads that use `rand()`, so no locking is necessary. 
 
 &nbsp;
+## Implicit seeding
+If one of the overloads of `rand()` is called in a given thread before it has been seeded in that thread, it behaves as if it had been seeded with `seed(1u)`.
+````cpp
+tbx::rand()                // implicitly seeded with srand(1u);
+tbx::rand<double>()        // implicitly seeded with srand<double>(1u);
+tbx::rand<std::uint64_t>   // implicitly seeded with srand<std::uint64_t>(1u);
+// etc.
+````
+
+&nbsp;
 ## Easy installation
 Just copy the header file `tbx.rand.h` to your project folder.
 
 &nbsp;
 ## Comprehensive test routines
 A comprehensive set of unit tests systematically vary the result type, testing each overload of `rand()`, `srand()`, and `rand_max()` for every one. A small set of use tests demonstrates the functions in action.
+
+&nbsp;
+## Check `random_device`
+Before using function `seed()`, the overload that uses `std::random_device`, you should satisfy yourself that `std::random_device` is a good source of entropy on your system. Sometimes, it is not.
+
+[Microsoft Visual C++](https://learn.microsoft.com/en-us/cpp/standard-library/random-device-class?view=msvc-170), for instance, generates "non-deterministic and cryptographically secure" values, and never blocks, which is excellent. Prior to version 9.2, however, [MinGW distributions of GCC](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85494) used `std::mt19937` with a fixed seed! Those systems generated the same sequence every time. (Newer versions purport to have fixed the problem, but I have not checked.) [Unix-like systems](https://en.wikipedia.org/wiki//dev/random) often use `/dev/random` (which can block) or `/dev/urandom`. Both have their advantages.
+
+So, do your homework.
+
+In case you decide not use function `seed()`, you can still use one of the other seeding functions. To seed `std::mt19937`, your best bet would then be to create a `std::seed_seq` with 624 seeds of type `unsigned`, and do your seeding with that. 
