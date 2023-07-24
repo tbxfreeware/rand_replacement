@@ -99,4 +99,4 @@ Before using function `seed()`, the overload that uses `std::random_device`, you
 
 So, do your homework.
 
-In case you decide not use function `seed()`, you can still use one of the other seeding functions. To seed `std::mt19937`, your best bet would then be to create a `std::seed_seq` with 624 seeds of type `unsigned`, and do your seeding with that. 
+In case you decide not use function `seed()`, you can still use one of the other seeding functions. To seed `std::mt19937` or `std::mt19937_64`, your best bet would then be to create a `std::seed_seq` with 624 seeds of type `unsigned`, and do your seeding with that. 
