@@ -113,11 +113,17 @@
 // engine for type int.
 //======================================================================
 
-#include <cstddef>      // size_t
-#include <cstdint>      // uint_fast16_t
-#include <random>       // mt19937, random_device, seed_seq, uniform_int_distribution, uniform_real_distribution
-#include <sstream>      // stringstream
-#include <type_traits>  // enable_if_t, integral_constant, is_floating_point_v, is_same_v, remove_cv_t
+#include <array>             // array
+#include <cstddef>           // size_t
+#include <cstdint>           // uint_fast16_t, uint_least32_t
+#include <initializer_list>  // initializer_list
+#include <iterator>          // interator_traits
+#include <limits>            // numeric_limits
+#include <random>            // mt19937, random_device, seed_seq, uniform_int_distribution, uniform_real_distribution
+#include <sstream>           // stringstream
+#include <stdexcept>         // invalid_argument
+#include <type_traits>       // enable_if_t, integral_constant, is_floating_point_v, is_integral_v, 
+                             // is_same_v, remove_cv_t, is_unsigned_v
 
 namespace tbx
 {
