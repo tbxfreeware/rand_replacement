@@ -11,15 +11,6 @@ The functions in this header require only the features of C++14, nothing later i
 
 - Adding function arguments restricts the range of generated values. For example, `tbx::rand(1, 6)` gets you a dice roll of type `int`, and `tbx::rand<double>(-180.0, 180.0)` generates a random angle between +/- 180 degrees.
 
-- Support for `param_type`
-```cpp
-// param_type is defined in std::uniform_int_distribution and std::uniform_real_distribution.
-// tbx::param_type simplifies its usage.
-tbx::param_type<double> p(-180.0, 180.0);
-tbx::srand<double>();  // randomly seed the engine used for doubles
-tbx::rand<double>(p);  // slightly faster than tbx::rand<double>(-180.0, 180.0);
-```
-
 &nbsp;
 ## Expanded seeding options
 There are three ways to seed the `std::mt19937` random number engine used by `tbx.rand.h`.
@@ -69,6 +60,17 @@ tbx::srand<std::uint32_t>(42u);      tbx::rand<std::uint32_t>();
 tbx::srand<std::uint64_t>(42u);      tbx::rand<std::uint64_t>();
 
 // etc.
+```
+
+&nbsp;
+## Support for `param_type`
+`param_type` is defined in `std::uniform_int_distribution` and `std::uniform_real_distribution`. `tbx::param_type` simplifies its usage. 
+
+When you call `tbx::rand(a, b)`, a new `param` object must be constructed from `a` and `b`. That step is bypassed when you call 'tbx::rand(param)`.
+```cpp
+tbx::param_type<double> p(-180.0, 180.0);
+tbx::srand<double>();  // randomly seed the engine used for doubles
+tbx::rand<double>(p);  // slightly faster than tbx::rand<double>(-180.0, 180.0);
 ```
 
 &nbsp;
