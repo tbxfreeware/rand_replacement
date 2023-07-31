@@ -66,7 +66,7 @@ tbx::srand<std::uint64_t>(42u);      tbx::rand<std::uint64_t>();
 ## Support for `param_type`
 `param_type` is defined in `std::uniform_int_distribution` and `std::uniform_real_distribution`. `tbx::param_type` simplifies its usage. 
 
-When you call `tbx::rand(a, b)`, a new `param` object must be constructed from `a` and `b`. That step is bypassed when you call 'tbx::rand(param)`.
+When you call `tbx::rand(a, b)`, a new `param` object must be constructed from `a` and `b`. That step is bypassed when you call `tbx::rand(param)`.
 ```cpp
 tbx::param_type<double> p(-180.0, 180.0);
 tbx::srand<double>();  // randomly seed the engine used for doubles
