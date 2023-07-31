@@ -68,9 +68,9 @@ tbx::srand<std::uint64_t>(42u);      tbx::rand<std::uint64_t>();
 
 When you call `tbx::rand(a, b)`, a new `param` object must be constructed from `a` and `b`. That step is bypassed when you call `tbx::rand(param)`.
 ```cpp
-tbx::param_type<double> p(-180.0, 180.0);
-tbx::srand<double>();  // randomly seed the engine used for doubles
-tbx::rand<double>(p);  // slightly faster than tbx::rand<double>(-180.0, 180.0);
+tbx::param_type<double> param(-180.0, 180.0);
+tbx::srand<double>();      // randomly seed the engine used for doubles
+tbx::rand<double>(param);  // slightly faster than tbx::rand<double>(-180.0, 180.0);
 ```
 
 &nbsp;
