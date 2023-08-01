@@ -30,16 +30,16 @@ For example, `tbx::srand(42u)` seeds the engine that generates `int` values, whi
 // even though its template argument may be different.
 
 tbx::srand(42u);                     tbx::rand();         // same as tbx::rand<int>();
-tbx::srand<bool>(42);                tbx::rand<bool>();
-tbx::srand<char>(42);                tbx::rand<char>();
+tbx::srand<bool>(42u);               tbx::rand<bool>();
+tbx::srand<char>(42u);               tbx::rand<char>();
 
-tbx::srand<signed char>(42);         tbx::rand<signed char>();
+tbx::srand<signed char>(42u);        tbx::rand<signed char>();
 tbx::srand<short>(42u);              tbx::rand<short>();
 tbx::srand<int>(42u);                tbx::rand<int>();
 tbx::srand<long>(42u);               tbx::rand<long>();
 tbx::srand<long long>(42u);          tbx::rand<long long>();
 
-tbx::srand<unsigned char>(42);       tbx::rand<unsigned char>();
+tbx::srand<unsigned char>(42u);      tbx::rand<unsigned char>();
 tbx::srand<unsigned short>(42u);     tbx::rand<unsigned short>();
 tbx::srand<unsigned int>(42u);       tbx::rand<unsigned int>();
 tbx::srand<unsigned long>(42u);      tbx::rand<unsigned long>();
